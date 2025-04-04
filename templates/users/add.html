@@ -1,45 +1,61 @@
 {% extends "base.html" %}
 
 {% block content %}
-            <div class="error_text">
-                {% if obj.errors | length > 0 %}
-                    {% for error in obj.errors  %}
-                        <div>{{ error }}</div>
-                    {% endfor %}
-				{% endif %}
-            </div>
-            <div>
-                <form action="manage?action=insert" method="POST">
-                    Name:<br>
-                    <input type="text" name="fname" value="{{ obj.data[0].fname }}" />
-                    <br>
+    <div class="error_text">
+        {% if obj.errors | length > 0 %}
+            {% for error in obj.errors %}
+                <div>{{ error }}</div>
+            {% endfor %}
+        {% endif %}
+    </div>
+    <div>
+        <form action="manage?action=insert" method="POST">
+            Name:<br>
+            <input type="text" name="Fname" value="{{ obj.data[0].Fname }}" />
+            <br>
 
-                    Email:<br>
-                    <input type="text" name="email" value="{{ obj.data[0].email }}" />
-                    <br>
+            Last Name:<br>
+            <input type="text" name="Fname" value="{{ obj.data[0].Fname }}" />
+            <br>
 
-                    Password:<br>
-                    <input type="password" name="password" value="" />
-                    <br>
+            Username:<br>
+            <input type="text" name="UserName" value="{{ obj.data[0].UserName }}" />
+            <br>
 
-                    Retype Password:<br>
-                    <input type="password" name="password2" value="" />
-                    <br>
+            Email:<br>
+            <input type="text" name="email" value="{{ obj.data[0].email }}" />
+            <br>
 
-                    Role:<br>
-                    <select name="role">
-                        {% for role in obj.roles  %}
-                            {% if  obj.data[0].role == role.value %}
-                                <option selected="true" value="{{ role.value }}">{{ role.text }}</option>
-                            {% else %}
-                                <option value="{{ role.value }}">{{ role.text }}</option>
-                            {% endif %}
-                        {% endfor %}
-                    </select>
-                    <br>
-                    <br>
-                    <input type="submit" value="Submit" />
-                </form>
-                
-            </div>
+            Password:<br>
+            <input type="password" name="password" value="" />
+            <br>
+
+            Retype Password:<br>
+            <input type="password" name="password2" value="" />
+            <br>
+
+            Role:<br>
+            <select name="role">
+                {% for role in obj.roles %}
+                    {% if obj.data[0].role == role.value %}
+                        <option selected="true" value="{{ role.value }}">{{ role.text }}</option>
+                    {% else %}
+                        <option value="{{ role.value }}">{{ role.text }}</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+            <br>
+
+            Access Code:<br>
+            <input type="text" name="AccessCode" value="{{ obj.data[0].AccessCode }}" readonly="readonly" />
+            <br>
+
+            Created On:<br>
+            <input type="datetime-local" name="CreatedTime" value="{{ obj.data[0].CreatedTime }}" readonly />
+            <br>
+            <br>
+
+            <input type="submit" value="Submit" />
+        </form>
+    </div>
 {% endblock %}
