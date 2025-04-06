@@ -6,7 +6,7 @@ from media import media
 class question(baseObject):
     def __init__(self):
         self.setup()
-        self.valid_types = ['open-ended', 'multiple-choice', 'scale', 'rating']  # Customize as needed
+        self.valid_types = ['open-ended', 'multiple-choice', 'scale', 'rating']  
 
     def verify_new(self, n=0):
         self.errors = []
