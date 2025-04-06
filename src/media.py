@@ -5,7 +5,6 @@ from experiments import experiments  # For validating foreign key
 class media(baseObject):
     def __init__(self):
         self.setup()
-        # Valid vehicle types for classification
         self.valid_types = ['car', 'truck', 'motorcycle']
 
     def verify_new(self, n=0):
@@ -19,11 +18,13 @@ class media(baseObject):
         if self.data[n].get('AutomobileType') not in self.valid_types:
             self.errors.append(f"AutomobileType must be one of: {', '.join(self.valid_types)}")
 
-        # Validate Duration format
+        # Validate Duration as positive number (seconds)
         try:
-            datetime.strptime(self.data[n]['Duration'], '%Y-%m-%d %H:%M:%S')
+            duration = float(self.data[n]['Duration'])
+            if duration <= 0:
+                self.errors.append('Duration must be a positive number (in seconds).')
         except Exception:
-            self.errors.append('Duration must be in YYYY-MM-DD HH:MM:SS format.')
+            self.errors.append('Duration must be a number (in seconds).')
 
         # Set CreatedTime to now
         self.data[n]['CreatedTime'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
@@ -51,12 +52,14 @@ class media(baseObject):
             if self.data[n]['AutomobileType'] not in self.valid_types:
                 self.errors.append(f"AutomobileType must be one of: {', '.join(self.valid_types)}")
 
-        # Validate Duration format if present
+        # Validate Duration as positive number (seconds)
         if 'Duration' in self.data[n]:
             try:
-                datetime.strptime(self.data[n]['Duration'], '%Y-%m-%d %H:%M:%S')
+                duration = float(self.data[n]['Duration'])
+                if duration <= 0:
+                    self.errors.append('Duration must be a positive number (in seconds).')
             except Exception:
-                self.errors.append('Duration must be in YYYY-MM-DD HH:MM:SS format.')
+                self.errors.append('Duration must be a number (in seconds).')
 
         # Validate CreatedTime format if provided
         if 'CreatedTime' in self.data[n]:
@@ -73,4 +76,3 @@ class media(baseObject):
                 self.errors.append(f"ExperimentID {self.data[n]['ExperimentID']} does not exist.")
 
         return len(self.errors) == 0
-
