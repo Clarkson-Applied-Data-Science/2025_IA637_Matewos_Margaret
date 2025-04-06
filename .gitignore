@@ -1,3 +1,4 @@
 config.yml
 *.sql
 test.py
+.DS_Store
