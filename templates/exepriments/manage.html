@@ -9,7 +9,7 @@
                 {% endif %}
             </div>
             <div>
-                <form action="/users/manage?pkval={{ obj.data[0].uid }}&action=update" method="POST">
+                <form action="/experiments/manage?pkval={{ obj.data[0].ExperimentID }}&action=update" method="POST">
                     <label for="make">Make:</label>
                     <input type="text" id="make" name="make" value="{{ obj.data[0].make }}"><br><br>
 
@@ -22,25 +22,12 @@
                     <label for="owner_uid">Owner:</label>
                     <input id="owner_uid" name="owner_uid" value="{{ obj.data[0].owner_uid }}"><br><br>
 
-
-                    Role:<br>
-                    <select name="role">
-                        {% for role in obj.roles  %}
-                            {% if  obj.data[0].role == role.value %}
-                                <option selected="true" value="{{ role.value }}">{{ role.text }}</option>
-                            {% else %}
-                                <option value="{{ role.value }}">{{ role.text }}</option>
-                            {% endif %}
-                        {% endfor %}
-                    </select>
-                    <br>
-                    <br>
                     <input type="submit" value="Submit" />
                 </form>
                 
             </div>
             <div>
                 <br><br>
-                <a href="/users/manage?pkval={{ obj.data[0].uid }}&action=delete">Delete</a>
+                <a href="/experiments/manage?pkval={{ obj.data[0].ExperimentID }}&action=delete">Delete</a>
             </div>
 {% endblock %}

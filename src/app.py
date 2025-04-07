@@ -3,11 +3,14 @@ from flask import render_template
 from flask import request,session, redirect, url_for, send_from_directory,make_response 
 from flask_session import Session
 from datetime import timedelta
+import datetime
+import os
 from user import user
-from vehicle import vehicle
+from experiments import experiments
 import time
 
-app = Flask(__name__,static_url_path='')
+app = Flask(__name__,static_url_path='',
+    template_folder=os.path.join(os.path.dirname(__file__), '..', 'templates'))
 
 app.config['SECRET_KEY'] = '5sdghsgRTg'
 app.config['SESSION_PERMANENT'] = True
@@ -58,7 +61,7 @@ def main():
     if session['user']['role'] == 'admin':
         return render_template('main.html', title='Main menu') 
     else:
-        return render_template('customer_main.html', title='Main menu') 
+        return render_template('experiments/list.html', title='Experiments') 
 
 @app.route('/users/manage',methods=['GET','POST'])
 def manage_user():
@@ -72,25 +75,36 @@ def manage_user():
         return render_template('ok_dialog.html',msg= "Deleted.")
     if action is not None and action == 'insert':
         d = {}
-        d['fname'] = request.form.get('fname')
+        d['Fname'] = request.form.get('Fname')
+        d['Lname'] = request.form.get('Lname')
         d['email'] = request.form.get('email')
         d['role'] = request.form.get('role')
+        d['UserName'] = request.form.get('UserName')
         d['password'] = request.form.get('password')
         d['password2'] = request.form.get('password2')
+        d['AccessCode'] = o.generate_accesscode()
+        d['CreatedTime'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         o.set(d)
+        default_dt = datetime.now().strftime('%Y-%m-%dT%H:%M')
         if o.verify_new():
             #print(o.data)
             o.insert()
             return render_template('ok_dialog.html',msg= "User added.")
         else:
-            return render_template('users/add.html',obj = o)
+            return render_template('users/add.html',obj = o, default_dt = default_dt)
+        
+
     if action is not None and action == 'update':
         o.getById(pkval)
-        o.data[0]['fname'] = request.form.get('fname')
+        o.data[0]['Fname'] = request.form.get('Fname')
+        o.data[0]['Lname'] = request.form.get('Lname')
         o.data[0]['email'] = request.form.get('email')
         o.data[0]['role'] = request.form.get('role')
+        o.data[0]['UserName'] = request.form.get('UserName')
         o.data[0]['password'] = request.form.get('password')
         o.data[0]['password2'] = request.form.get('password2')
+        o.data[0]['AccessCode'] = request.form.get('AccessCode')
+        o.data[0]['CreatedTime'] = request.form.get('CreatedTime')
         if o.verify_update():
             o.update()
             return render_template('ok_dialog.html',msg= "User updated. ")
@@ -101,72 +115,75 @@ def manage_user():
         return render_template('users/list.html',obj = o)
     if pkval == 'new':
         o.createBlank()
-        return render_template('users/add.html',obj = o)
+        default_dt = datetime.now().strftime('%Y-%m-%dT%H:%M')
+        return render_template('users/add.html',obj = o, default_dt = default_dt)
     else:
         print(pkval)
         o.getById(pkval)
         return render_template('users/manage.html',obj = o)
     
 ##############################################################################3
-###################               vehicles:
+###################              Experiments:
 ############################################################################
 
-@app.route('/vehicles/manage', methods=['GET', 'POST'])
-def manage_vehicle():
+@app.route('/experiments/manage', methods=['GET', 'POST'])
+def manage_experiments():
     if checkSession() == False or session['user']['role'] != 'admin':
         return redirect('/login')
-    o = vehicle()  
+    e = experiments()  
     action = request.args.get('action')
     pkval = request.args.get('pkval')
 
     if action == 'delete' and pkval:
-        o.deleteById(pkval)
-        return render_template('ok_dialog.html', msg="Vehicle deleted.")
+        e.deleteById(pkval)
+        return render_template('ok_dialog.html', msg="Experiment deleted.")
 
     if action == 'insert':
         d = {}
-        d['vid'] = request.form.get('vid')
-        d['make'] = request.form.get('make')
-        d['model'] = request.form.get('model')
-        d['owner_uid'] = request.form.get('owner_uid')
-        d['year'] = request.form.get('year')
-        o.set(d)
-        if o.verify_new():  # You'll need to implement this in your vehicle class
-            o.insert()
-            return render_template('ok_dialog.html', msg="Vehicle added.")
+        d['ExperimentID'] = request.form.get('ExperimentID')
+        d['StartDate'] = request.form.get('StartDate')
+        d['EndDate'] = request.form.get('EndDate')
+        d['Description'] = request.form.get('Description')
+        d['CreatedTime'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        e.set(d)
+
+        default_dt = datetime.now().strftime('%Y-%m-%dT%H:%M')
+        if e.verify_new():  
+            e.insert()
+            return render_template('ok_dialog.html', msg="Experiment added.")
         else:
-            return render_template('vehicles/add.html', obj=o)
+            return render_template('experiments/add.html', obj=e, default_dt = default_dt)
 
     if action == 'update' and pkval:
-        o.getById(pkval)
-        if o.data:
-            o.data[0]['vid'] = request.form.get('vid')
-            o.data[0]['make'] = request.form.get('make')
-            o.data[0]['model'] = request.form.get('model')
-            o.data[0]['owner_uid'] = request.form.get('owner_uid')
-            o.data[0]['year'] = request.form.get('year')
-            if o.verify_update():  # Implement this in your vehicle class
-                o.update()
-                return render_template('ok_dialog.html', msg="Vehicle updated.")
+        e.getById(pkval)
+        if e.data:
+            e.data[0]['ExperimentID'] = request.form.get('ExperimentID')
+            e.data[0]['StartDate'] = request.form.get('StartDate')
+            e.data[0]['EndDate'] = request.form.get('EndDate')
+            e.data[0]['Description'] = request.form.get('Description')
+            e.data[0]['UpdatedDate'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            if e.verify_update():  
+                e.update()
+                return render_template('ok_dialog.html', msg="Experiment updated.")
             else:
-                return render_template('vehicles/manage.html', obj=v)
+                return render_template('experiments/manage.html', obj=e)
         else:
-            return render_template('error_dialog.html', msg=f"Vehicle with ID {pkval} not found.")
+            return render_template('error_dialog.html', msg=f"Experiment with ID {pkval} was not found.")
 
     if pkval is None:
-        o.getAll()
-        return render_template('vehicles/list.html', obj=o)
+        e.getAll()
+        return render_template('experiments/list.html', obj=e)
 
     if pkval == 'new':
-        o.createBlank()
-        return render_template('vehicles/add.html', obj=o)
+        e.createBlank()
+        return render_template('experiments/add.html', obj=e)
 
     else:
-        o.getById(pkval)
-        if o.data:
-            return render_template('vehicles/manage.html', obj=o)
+        e.getById(pkval)
+        if e.data:
+            return render_template('experiments/manage.html', obj=e)
         else:
-            return render_template('error_dialog.html', msg=f"Vehicle with ID {pkval} not found.")
+            return render_template('error_dialog.html', msg=f"Experiment with ID {pkval} was not found.")
 
 # endpoint route for static files
 @app.route('/static/<path:path>')

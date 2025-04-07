@@ -9,13 +9,21 @@
                 {% endif %}
             </div>
             <div>
-                <form action="/users/manage?pkval={{ obj.data[0].uid }}&action=update" method="POST">
+                <form action="/users/manage?pkval={{ obj.data[0].UserID }}&action=update" method="POST">
                     Name:<br>
-                    <input type="text" name="fname" value="{{ obj.data[0].fname }}" />
+                    <input type="text" name="Fname" value="{{ obj.data[0].Fname }}" />
+                    <br>
+
+                    Last Name:<br>
+                    <input type="text" name="Lname" value="{{ obj.data[0].Lname }}" />
                     <br>
 
                     Email:<br>
                     <input type="text" name="email" value="{{ obj.data[0].email }}" />
+                    <br>
+
+                    Username:<br>
+                    <input type="text" name="UserName" value="{{ obj.data[0].UserName }}" />
                     <br>
 
                     Password:<br>
@@ -28,14 +36,22 @@
 
                     Role:<br>
                     <select name="role">
-                        {% for role in obj.roles  %}
-                            {% if  obj.data[0].role == role.value %}
+                        {% for role in obj.roles %}
+                            {% if obj.data[0].role == role.value %}
                                 <option selected="true" value="{{ role.value }}">{{ role.text }}</option>
                             {% else %}
                                 <option value="{{ role.value }}">{{ role.text }}</option>
                             {% endif %}
                         {% endfor %}
                     </select>
+                    <br>
+
+                    Access Code:<br>
+                    <input type="text" name="AccessCode" value="{{ obj.data[0].AccessCode }}" readonly="readonly" />
+                    <br>
+
+                    Updated On:<br>
+                    <input type="datetime-local" name="UpdateDate" value="{{ obj.data[0]['UpdatedDate'] if 'UpdatedDate' in obj.data[0] else '' }}" readonly class="form-control"/>
                     <br>
                     <br>
                     <input type="submit" value="Submit" />
@@ -44,6 +60,6 @@
             </div>
             <div>
                 <br><br>
-                <a href="/users/manage?pkval={{ obj.data[0].uid }}&action=delete">Delete</a>
+                <a href="/users/manage?pkval={{ obj.data[0].UserID }}&action=delete">Delete</a>
             </div>
 {% endblock %}

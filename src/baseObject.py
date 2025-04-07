@@ -8,7 +8,7 @@ class baseObject:
         self.errors = []
         self.fields = []
         self.pk = None
-        config = yaml.safe_load(Path("config.yml").read_text())
+        config = yaml.safe_load(Path("../config.yml").read_text())
 
         #print(type(self).__name__)
         self.tn = config['tables'][type(self).__name__]

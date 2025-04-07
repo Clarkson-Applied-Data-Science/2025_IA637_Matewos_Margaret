@@ -47,7 +47,7 @@ This app allows users to listen to vehicle sounds (car, motorcycle, truck or oth
 
 - CREATE TABLE mm_experiment ( ExperimentID INT AUTO_INCREMENT PRIMARY KEY, ExperimentName VARCHAR(100) NOT NULL,
     StartDate DATETIME NOT NULL, EndDate DATETIME NOT NULL, Description VARCHAR(100) NOT NULL,
-    CreatedTime DATETIME NOT NULL, UpdatedDate DATETIME NOT NULL) ENGINE=MyISAM;
+    CreatedTime DATETIME NOT NULL, UpdatedDate DATETIME NULL) ENGINE=MyISAM;
 
 - CREATE TABLE mm_media ( MediaID INT AUTO_INCREMENT PRIMARY KEY, FilePath VARCHAR(100) NOT NULL, AutomobileType VARCHAR(50) NOT NULL,
     Duration FLOAT NOT NULL, CreatedTime DATETIME NOT NULL, ExperimentID INT NOT NULL,
