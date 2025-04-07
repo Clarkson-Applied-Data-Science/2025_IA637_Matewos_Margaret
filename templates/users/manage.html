@@ -49,9 +49,8 @@
                     Access Code:<br>
                     <input type="text" name="AccessCode" value="{{ obj.data[0].AccessCode }}" readonly="readonly" />
                     <br>
-
-                    Updated On:<br>
-                    <input type="datetime-local" name="UpdateDate" value="{{ obj.data[0]['UpdatedDate'] if 'UpdatedDate' in obj.data[0] else '' }}" readonly class="form-control"/>
+                    Created on:<br>
+                    <input type="datetime" name="CreatedTime" value="{{ obj.data[0].CreatedTime }}" readonly="readonly" />
                     <br>
                     <br>
                     <input type="submit" value="Submit" />

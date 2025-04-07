@@ -10,16 +10,18 @@
                     <thead>
                         <tr>
                             <th>Edit</th>
-                            <th>Make</th>
-                            <th>Model</th>
+                            <th>Start Date</th>
+                            <th>End Date</th>
+                            <th>Description</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for obj in obj.data  %}
                         <tr>
                             <td><a href="manage?pkval={{ obj.ExperimentID }}">Edit</a></td>
-                            <td>{{ obj.make }}</td>
-                            <td>{{ obj.model }}</td>
+                            <td>{{ obj.StartDate }}</td>
+                            <td>{{ obj.EndDate }}</td>
+                            <td>{{ obj.Description }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>

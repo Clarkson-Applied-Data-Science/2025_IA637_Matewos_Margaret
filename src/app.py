@@ -140,7 +140,6 @@ def manage_experiments():
 
     if action == 'insert':
         d = {}
-        d['ExperimentID'] = request.form.get('ExperimentID')
         d['StartDate'] = request.form.get('StartDate')
         d['EndDate'] = request.form.get('EndDate')
         d['Description'] = request.form.get('Description')
