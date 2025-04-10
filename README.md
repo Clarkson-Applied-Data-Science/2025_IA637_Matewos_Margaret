@@ -42,12 +42,14 @@ This app allows users to listen to vehicle sounds (car, motorcycle, truck or oth
 ![alt text](images/relational_schema.png)
 
 ## SQL view queries
-- CREATE TABLE mm_user (
-    UserID INT AUTO_INCREMENT PRIMARY KEY, Fname VARCHAR(50) NOT NULL, Lname VARCHAR(50) NOT NULL, email VARCHAR(50) NOT NULL, role VARCHAR(50) NOT NULL, UserName VARCHAR(50) NOT NULL, password VARCHAR(100) NOT NULL, AccessCode INT NOT NULL, CreatedTime DATETIME NOT NULL) ENGINE=MyISAM;
-
 - CREATE TABLE mm_experiment ( ExperimentID INT AUTO_INCREMENT PRIMARY KEY, ExperimentName VARCHAR(100) NOT NULL,
-    StartDate DATETIME NOT NULL, EndDate DATETIME NOT NULL, Description VARCHAR(100) NOT NULL, Code VARCHAR(100),
-    CreatedTime DATETIME NOT NULL, UpdatedDate DATETIME NULL,Created_UserID, FOREIGN KEY (Created_UserID) REFERENCES user(UserID)) ENGINE=MyISAM;
+    StartDate DATETIME NOT NULL, EndDate DATETIME NOT NULL, Description VARCHAR(100) NOT NULL, 
+    CreatedTime DATETIME NOT NULL, UpdatedDate DATETIME NULL,Creator_UserID, FOREIGN KEY (Creator_UserID) REFERENCES user(UserID)) ENGINE=MyISAM;
+
+- CREATE TABLE mm_participant_codes (
+    participant_code_id INT AUTO_INCREMENT PRIMARY KEY,
+    AccessCode VARCHAR(32) UNIQUE, experiment_id INT, 
+    FOREIGN KEY (experiment_id) REFERENCES experiment(ExperimentID))ENGINE=MyISAM;
 
 - CREATE TABLE mm_media ( MediaID INT AUTO_INCREMENT PRIMARY KEY, FilePath VARCHAR(100) NOT NULL, AutomobileType VARCHAR(50) NOT NULL,
     Duration FLOAT NOT NULL, CreatedTime DATETIME NOT NULL, ExperimentID INT NOT NULL,

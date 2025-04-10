@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Welcome to the Sound Annoyance Survey</h1>
+    <p>We are conducting a survey on sound annoyance. Would you like to participate?</p>
+    
+    <form action="/start_survey" method="POST">
+        <button type="submit" name="agree" value="yes">Yes, I want to participate</button>
+        <button type="submit" name="agree" value="no">No, I do not want to participate</button>
+    </form>
+   
+{% endblock %}

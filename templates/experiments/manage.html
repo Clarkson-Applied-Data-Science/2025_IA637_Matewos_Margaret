@@ -10,27 +10,32 @@
             </div>
             <div>
                 <form action="/experiments/manage?pkval={{ obj.data[0].ExperimentID }}&action=update" method="POST">
+                    Experiment Name:<br>
+                    <input type="text" name="ExperimentName" value="{{ obj.data[0].ExperimentName }}" />
+                    <br>
                     Start Date:<br>
-                    <input type="datetime" name="StartDate" value="{{ obj.data[0].StartDate }}" />
+                    <input type="date" name="StartDate" value="{{ obj.data[0].StartDate }}" />
                     <br>
 
                     End Date:<br>
-                    <input type="datetime" name="EndDate" value="{{ obj.data[0].EndDate }}" />
+                    <input type="date" name="EndDate" value="{{ obj.data[0].EndDate }}" />
                     <br>
 
                     Description:<br>
                     <input type="text" name="Description" value="{{ obj.data[0].Description }}" />
                     <br>
-
-                    Created on:<br>
-                    <input type="datetime" name="CreatedTime" value="{{ obj.data[0].CreatedTime }}" readonly="readonly" />
+                    Created by:<br>
+                    <select name="Creator_UserID">
+                        {% for creator in obj.creators %}
+                            {% if  obj.data[0].Creator_UserID == creator.UserID %}
+                                <option selected="true" value="{{ creator.UserID }}">{{ creator.UserName }} ({{creator.email}})</option>
+                            {% else %}
+                                <option value="{{ creator.UserID }}">{{ creator.UserName }} ({{creator.email}})</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
                     <br>
-
-                    Updated On:<br>
-                    <input type="datetime-local" name="UpdateDate" value="{{ obj.data[0]['UpdatedDate'] if 'UpdatedDate' in obj.data[0] else '' }}" readonly class="form-control"/>
                     <br>
-                    <br>
-
                     <input type="submit" value="Submit" />
                 </form>
                 

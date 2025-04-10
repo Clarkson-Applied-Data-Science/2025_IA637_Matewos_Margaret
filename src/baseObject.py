@@ -57,6 +57,7 @@ class baseObject:
         sql = sql[0:-1]
         sql += f' WHERE `{self.pk}` = %s;'
         parameters.append(self.data[0][self.pk])
+        #print(sql,parameters)
         self.cur.execute(sql, parameters)
     def getAll(self):
         sql = f'SELECT * FROM `{self.tn}`;'

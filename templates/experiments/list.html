@@ -10,18 +10,24 @@
                     <thead>
                         <tr>
                             <th>Edit</th>
+                            <th>Experiment</th>
                             <th>Start Date</th>
                             <th>End Date</th>
                             <th>Description</th>
+                            <th>Created on</th>
+                            <th>Created By</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for obj in obj.data  %}
                         <tr>
                             <td><a href="manage?pkval={{ obj.ExperimentID }}">Edit</a></td>
+                            <td>{{ obj.ExperimentName }}</td>
                             <td>{{ obj.StartDate }}</td>
                             <td>{{ obj.EndDate }}</td>
                             <td>{{ obj.Description }}</td>
+                            <td>{{ obj.CreatedTime }}</td>
+                            <td>{{ obj.Creator_UserID }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>

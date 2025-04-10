@@ -1,11 +1,13 @@
 from baseObject import baseObject
 from datetime import datetime
+from participants import participant_codes
 
 class experiments(baseObject):
    
     def __init__(self):
         self.setup()
-
+    
+       
     def verify_new(self, n=0):
         self.errors = []
 
@@ -35,3 +37,26 @@ class experiments(baseObject):
         self.data[n]['UpdatedDate'] = datetime.now().strftime('%Y-%m-%d')
 
         return len(self.errors) == 0
+
+
+    def getActiveExperiments(self):
+        
+        sql = f'SELECT ExperimentID, Description FROM `{self.tn}` WHERE `StartDate` <= NOW() AND `EndDate` >= NOW();'
+        
+        self.cur.execute(sql)
+        self.data = []
+        for row in self.cur:
+            self.data.append(row)
+
+    def generate_access_code(self, experiment_id):
+        pc = participant_codes()
+        access_code = pc.create_code(experiment_id)
+        return access_code
+    
+    def getCreatedBy(self):
+        sql = f'SELECT * FROM `mm_experiment` LEFT JOIN `mm_user` ON `mm_user`.`UserID`  = `mm_experiment`.`Creator_UserID`;'
+        print(sql)
+        self.cur.execute(sql)
+        self.data = []
+        for row in self.cur:
+            self.data.append(row)

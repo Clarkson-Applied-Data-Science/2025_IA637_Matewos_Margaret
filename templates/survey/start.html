@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="container">
+        <h2>Survey for Experiment {{ experiment_id }}</h2>
+
+        <!-- Start of the survey form -->
+        <form action="{{ url_for('submit_survey') }}" method="POST">
+            <div class="survey-questions">
+                {% for question in questions %}
+                    <div class="question">
+                        <label for="question_{{ question.id }}">{{ question.text }}</label>
+                        <!-- Example question type handling -->
+                        {% if question.type == 'text' %}
+                            <input type="text" id="question_{{ question.id }}" name="question_{{ question.id }}" class="form-control" required>
+                        {% elif question.type == 'radio' %}
+                            {% for option in question.options %}
+                                <div>
+                                    <input type="radio" id="question_{{ question.id }}_{{ option }}" name="question_{{ question.id }}" value="{{ option }}" required>
+                                    <label for="question_{{ question.id }}_{{ option }}">{{ option }}</label>
+                                </div>
+                            {% endfor %}
+                        {% elif question.type == 'checkbox' %}
+                            {% for option in question.options %}
+                                <div>
+                                    <input type="checkbox" id="question_{{ question.id }}_{{ option }}" name="question_{{ question.id }}[]" value="{{ option }}">
+                                    <label for="question_{{ question.id }}_{{ option }}">{{ option }}</label>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+
+            <div class="submit-button">
+                <button type="submit" class="btn btn-primary">Submit Survey</button>
+            </div>
+        </form>
+    </div>
+{% endblock %}

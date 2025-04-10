@@ -7,6 +7,7 @@ import datetime
 import os
 from user import user
 from experiments import experiments
+from participants import participant_codes
 import time
 
 app = Flask(__name__,static_url_path='',
@@ -21,11 +22,60 @@ sess.init_app(app)
 
 @app.route('/')
 def home():
-    return redirect('/login')
+    return redirect('/homepage')
 
 @app.context_processor
 def inject_user():
     return dict(me=session.get('user'))
+
+def format_datetime(value, format='%Y-%m-%d %H:%M:%S'):
+    if value is None:
+        return ''
+    try:
+        return value.strftime(format)
+    except AttributeError:
+        return 'NA'
+
+app.jinja_env.filters['format_datetime'] = format_datetime
+
+@app.route('/homepage', methods=['GET', 'POST'])
+def homepage():
+    if 'user' in session:
+        me = session['user']
+    else:
+        me = None
+
+    # Fetch the experiment_id dynamically from the experiments table
+    e = experiments()
+    e.getAll() 
+    experiment_id = e.data[0]['ExperimentID'] if e.data else None 
+
+    if experiment_id is None:
+        return render_template('error_dialog.html', msg="No active experiment found.")
+
+    if request.method == 'POST':
+        agree = request.form.get('agree')
+
+        if agree == 'yes':
+            # Create the access code and associate it with the experiment_id from the table
+            access_code = participant_codes().create_code(experiment_id)
+            
+            # Store access code and experiment_id in session for later use
+            session['experiment_id'] = experiment_id
+            session['access_code'] = access_code
+
+            # Redirect to the survey page
+            return redirect(url_for('start_survey'))
+
+        elif agree == 'no':
+            return render_template('homepage.html', me=me)
+    
+    # Render the homepage template
+    return render_template('homepage.html', me=me)
+
+    
+    # Render the homepage
+    return render_template('homepage.html', me=me)
 
 @app.route('/login',methods = ['GET','POST'])
 def login():
@@ -53,6 +103,7 @@ def logout():
         del session['user']
         del session['active']
     return render_template('login.html', title='Login', msg='You have logged out.')
+
 @app.route('/main')
 def main():
     if checkSession() == False: 
@@ -62,6 +113,23 @@ def main():
         return render_template('main.html', title='Main menu') 
     else:
         return render_template('experiments/list.html', title='Experiments') 
+
+@app.route('/access/<code>')
+def access_with_code(code):
+    pc = participant_codes()
+    experiment_id = pc.get_experiment_from_code(code)
+
+    if experiment_id:
+        e = experiments()
+        e.getById(experiment_id)
+        if not e.data:
+            return render_template('error_dialog.html', msg="Experiment not found.")
+        # You might want to store access in session for later use
+        session['experiment_id'] = experiment_id
+        session['access_code'] = code
+        return redirect(url_for('start_survey'))  # Add this route too
+    else:
+        return render_template('error_dialog.html', msg="Invalid access code.")
 
 @app.route('/users/manage',methods=['GET','POST'])
 def manage_user():
@@ -82,16 +150,15 @@ def manage_user():
         d['UserName'] = request.form.get('UserName')
         d['password'] = request.form.get('password')
         d['password2'] = request.form.get('password2')
-        d['AccessCode'] = o.generate_accesscode()
-        d['CreatedTime'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        d['CreatedTime'] = datetime.datetime.now()
         o.set(d)
-        default_dt = datetime.now().strftime('%Y-%m-%dT%H:%M')
+        
         if o.verify_new():
             #print(o.data)
             o.insert()
             return render_template('ok_dialog.html',msg= "User added.")
         else:
-            return render_template('users/add.html',obj = o, default_dt = default_dt)
+            return render_template('users/add.html',obj = o)
         
 
     if action is not None and action == 'update':
@@ -103,8 +170,7 @@ def manage_user():
         o.data[0]['UserName'] = request.form.get('UserName')
         o.data[0]['password'] = request.form.get('password')
         o.data[0]['password2'] = request.form.get('password2')
-        o.data[0]['AccessCode'] = request.form.get('AccessCode')
-        o.data[0]['CreatedTime'] = request.form.get('CreatedTime')
+        
         if o.verify_update():
             o.update()
             return render_template('ok_dialog.html',msg= "User updated. ")
@@ -115,22 +181,26 @@ def manage_user():
         return render_template('users/list.html',obj = o)
     if pkval == 'new':
         o.createBlank()
-        default_dt = datetime.now().strftime('%Y-%m-%dT%H:%M')
-        return render_template('users/add.html',obj = o, default_dt = default_dt)
+        
+        return render_template('users/add.html',obj = o)
     else:
         print(pkval)
         o.getById(pkval)
         return render_template('users/manage.html',obj = o)
     
-##############################################################################3
+#####################################################################################################################
 ###################              Experiments:
-############################################################################
+#####################################################################################################################
 
 @app.route('/experiments/manage', methods=['GET', 'POST'])
 def manage_experiments():
     if checkSession() == False or session['user']['role'] != 'admin':
         return redirect('/login')
+    
     e = experiments()  
+    u = user()
+    u.getAll()
+    e.creators = u.data
     action = request.args.get('action')
     pkval = request.args.get('pkval')
 
@@ -140,27 +210,35 @@ def manage_experiments():
 
     if action == 'insert':
         d = {}
+        d['ExperimentName'] = request.form.get('ExperimentName')
         d['StartDate'] = request.form.get('StartDate')
         d['EndDate'] = request.form.get('EndDate')
         d['Description'] = request.form.get('Description')
-        d['CreatedTime'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        d['CreatedTime'] = datetime.datetime.now()
+        d['UpdatedDate'] = request.form.get('UpdatedDate')
+        d['Creator_UserID'] = request.form.get('Creator_UserID')
+        
         e.set(d)
 
-        default_dt = datetime.now().strftime('%Y-%m-%dT%H:%M')
-        if e.verify_new():  
+        if e.verify_new():
             e.insert()
-            return render_template('ok_dialog.html', msg="Experiment added.")
+            ExperimentID = e.data[0][e.pk] 
+            pc = participant_codes()
+            AccessCode = pc.create_code(ExperimentID)
+            e.update() 
+            return render_template('ok_dialog.html', msg="Experiment added.", code=AccessCode) 
         else:
-            return render_template('experiments/add.html', obj=e, default_dt = default_dt)
+            return render_template('experiments/add.html', obj=e)
 
     if action == 'update' and pkval:
         e.getById(pkval)
         if e.data:
-            e.data[0]['ExperimentID'] = request.form.get('ExperimentID')
+            e.data[0]['ExperimentName'] = request.form.get('ExperimentName')
             e.data[0]['StartDate'] = request.form.get('StartDate')
             e.data[0]['EndDate'] = request.form.get('EndDate')
             e.data[0]['Description'] = request.form.get('Description')
-            e.data[0]['UpdatedDate'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            e.data[0]['UpdatedDate'] = datetime.datetime.now()
+            e.data[0]['Creator_UserID'] = request.form.get('Creator_UserID')
             if e.verify_update():  
                 e.update()
                 return render_template('ok_dialog.html', msg="Experiment updated.")
@@ -170,7 +248,7 @@ def manage_experiments():
             return render_template('error_dialog.html', msg=f"Experiment with ID {pkval} was not found.")
 
     if pkval is None:
-        e.getAll()
+        e.getCreatedBy()
         return render_template('experiments/list.html', obj=e)
 
     if pkval == 'new':
@@ -183,6 +261,22 @@ def manage_experiments():
             return render_template('experiments/manage.html', obj=e)
         else:
             return render_template('error_dialog.html', msg=f"Experiment with ID {pkval} was not found.")
+############################################################################################################################
+######## Survey
+############################################################################################################################
+
+@app.route('/start_survey', methods=['GET', 'POST'])
+def start_survey():
+    if 'experiment_id' not in session or 'access_code' not in session:
+        return redirect('/homepage')  
+    experiment_id = session['experiment_id']
+    access_code = session['access_code']
+
+    if request.method == 'POST':
+        pass
+
+    return render_template('survey/start.html', experiment_id=experiment_id, access_code=access_code)
+
 
 # endpoint route for static files
 @app.route('/static/<path:path>')
