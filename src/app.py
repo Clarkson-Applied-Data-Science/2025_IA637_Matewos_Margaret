@@ -45,32 +45,17 @@ def homepage():
     else:
         me = None
 
-    # Fetch the experiment_id dynamically from the experiments table
-    e = experiments()
-    e.getAll() 
-    experiment_id = e.data[0]['ExperimentID'] if e.data else None 
-
-    if experiment_id is None:
-        return render_template('error_dialog.html', msg="No active experiment found.")
-
     if request.method == 'POST':
         agree = request.form.get('agree')
 
         if agree == 'yes':
-            # Create the access code and associate it with the experiment_id from the table
-            access_code = participant_codes().create_code(experiment_id)
-            
-            # Store access code and experiment_id in session for later use
-            session['experiment_id'] = experiment_id
+            access_code = participant_codes().create_code()
             session['access_code'] = access_code
-
-            # Redirect to the survey page
-            return redirect(url_for('start_survey'))
+            return redirect('/start_survey')
 
         elif agree == 'no':
             return render_template('homepage.html', me=me)
-    
-    # Render the homepage template
+
     return render_template('homepage.html', me=me)
 
 
@@ -121,10 +106,10 @@ def access_with_code(code):
         e.getById(experiment_id)
         if not e.data:
             return render_template('error_dialog.html', msg="Experiment not found.")
-        # You might want to store access in session for later use
+        
         session['experiment_id'] = experiment_id
         session['access_code'] = code
-        return redirect(url_for('start_survey'))  # Add this route too
+        return redirect(url_for('start_survey')) 
     else:
         return render_template('error_dialog.html', msg="Invalid access code.")
 
@@ -193,8 +178,8 @@ def manage_user():
 def manage_experiments():
     if checkSession() == False or session['user']['role'] != 'admin':
         return redirect('/login')
-    
-    e = experiments()  
+
+    e = experiments()
     u = user()
     u.getAll()
     e.creators = u.data
@@ -214,18 +199,17 @@ def manage_experiments():
         d['CreatedTime'] = datetime.datetime.now()
         d['UpdatedDate'] = request.form.get('UpdatedDate')
         d['Creator_UserID'] = request.form.get('Creator_UserID')
-        
+
         e.set(d)
 
         if e.verify_new():
             e.insert()
-            ExperimentID = e.data[0][e.pk] 
-            pc = participant_codes()
-            AccessCode = pc.create_code(ExperimentID)
-            experiment_code = e.generate_experiment_code(ExperimentID) 
-            e.data[0]['ExperimentCode'] = experiment_code 
-            e.update() 
-            return render_template('ok_dialog.html', msg="Experiment added.", code=AccessCode) 
+            ExperimentID = e.data[0][e.pk]
+            access_code = participant_codes().create_code()
+            experiment_code = e.generate_experiment_code(ExperimentID)
+            e.data[0]['ExperimentCode'] = experiment_code
+            e.update()
+            return render_template('ok_dialog.html', msg="Experiment added.", code=access_code)
         else:
             return render_template('experiments/add.html', obj=e)
 
@@ -238,7 +222,11 @@ def manage_experiments():
             e.data[0]['Description'] = request.form.get('Description')
             e.data[0]['UpdatedDate'] = datetime.datetime.now()
             e.data[0]['Creator_UserID'] = request.form.get('Creator_UserID')
-            if e.verify_update():  
+
+            if e.verify_update():
+                ExperimentID = e.data[0][e.pk]
+                experiment_code = e.generate_experiment_code(ExperimentID)
+                e.data[0]['ExperimentCode'] = experiment_code
                 e.update()
                 return render_template('ok_dialog.html', msg="Experiment updated.")
             else:

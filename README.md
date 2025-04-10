@@ -52,8 +52,7 @@ This app allows users to listen to vehicle sounds (car, motorcycle, truck or oth
 
 - CREATE TABLE mm_participant_codes (
     participant_code_id INT AUTO_INCREMENT PRIMARY KEY,
-    AccessCode VARCHAR(32) UNIQUE, experiment_id INT, 
-    FOREIGN KEY (experiment_id) REFERENCES experiment(ExperimentID))ENGINE=MyISAM;
+    AccessCode VARCHAR(32) UNIQUE)ENGINE=MyISAM;
 
 - CREATE TABLE mm_media ( MediaID INT AUTO_INCREMENT PRIMARY KEY, FilePath VARCHAR(100) NOT NULL, AutomobileType VARCHAR(50) NOT NULL,
     Duration FLOAT NOT NULL, CreatedTime DATETIME NOT NULL, ExperimentID INT NOT NULL,
@@ -66,5 +65,5 @@ This app allows users to listen to vehicle sounds (car, motorcycle, truck or oth
 
 - CREATE TABLE mm_response ( ResponseID INT AUTO_INCREMENT PRIMARY KEY, Value INT NOT NULL, VehicleGuess VARCHAR(50) NOT NULL,
     CorrectGuess CHAR(1) NOT NULL, CreatedTime DATETIME NOT NULL, Duration DATETIME NOT NULL,
-    UserID INT NOT NULL,  QuestionID INT NOT NULL, FOREIGN KEY (UserID) REFERENCES mm_user(UserID),
+    participant_code_id INT NOT NULL,  QuestionID INT NOT NULL, FOREIGN KEY (participant_code_id) REFERENCES mm_participant_codes(participant_code_id),
     FOREIGN KEY (QuestionID) REFERENCES mm_question(QuestionID)) ENGINE=MyISAM;

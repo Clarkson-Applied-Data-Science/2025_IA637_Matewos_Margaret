@@ -48,11 +48,6 @@ class experiments(baseObject):
         self.data = []
         for row in self.cur:
             self.data.append(row)
-
-    def generate_access_code(self, experiment_id):
-        pc = participant_codes()
-        access_code = pc.create_code(experiment_id)
-        return access_code
     
     def generate_experiment_code(self, experiment_id):
         """Generates an MD5 hash of the experiment_id."""
