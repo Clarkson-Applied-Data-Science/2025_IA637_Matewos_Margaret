@@ -55,9 +55,7 @@ def homepage():
 
         elif agree == 'no':
             return render_template('homepage.html', me=me)
-
     return render_template('homepage.html', me=me)
-
 
 @app.route('/login',methods = ['GET','POST'])
 def login():
@@ -89,7 +87,7 @@ def logout():
 @app.route('/main')
 def main():
     if checkSession() == False: 
-        return redirect('/homepage')
+        return redirect('/login')
     
     if session['user']['role'] == 'admin':
         return render_template('main.html', title='Main menu') 
@@ -254,15 +252,33 @@ def manage_experiments():
 
 @app.route('/start_survey', methods=['GET', 'POST'])
 def start_survey():
-    if 'experiment_id' not in session or 'access_code' not in session:
-        return redirect('/homepage')  
-    experiment_id = session['experiment_id']
+    print("start_survey route accessed") #debug
+    if 'access_code' not in session:
+        print("access_code not in session") #debug
+        return redirect('/homepage')
+
     access_code = session['access_code']
+    print(f"access_code: {access_code}") #debug
+    pc = participant_codes()
+    participant_id = pc.get_participant_id_from_code(access_code)
 
-    if request.method == 'POST':
-        pass
+    if participant_id:
+        e = experiments()
+        e.getByField('ExperimentCode', access_code)
+        if not e.data:
+            print("experiment not found") #debug
+            return render_template('error_dialog.html', msg="Experiment not found.")
+        experiment_id = e.data[0]['ExperimentID']
 
-    return render_template('survey/start.html', experiment_id=experiment_id, access_code=access_code)
+        print(f"experiment_id: {experiment_id}, participant_id: {participant_id}") #debug
+
+        # Retrieve questions from mm_question using experiment_id
+        questions = get_questions_by_experiment_id(experiment_id)
+
+        return render_template('survey/start.html', access_code=access_code, questions=questions, participant_id=participant_id)
+    else:
+        print("access_code not found in participant_codes") #debug
+        return render_template('error_dialog.html', msg="Access code not found.")
 
 
 # endpoint route for static files
