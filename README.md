@@ -42,9 +42,13 @@ This app allows users to listen to vehicle sounds (car, motorcycle, truck or oth
 ![alt text](images/relational_schema.png)
 
 ## SQL view queries
-- CREATE TABLE mm_experiment ( ExperimentID INT AUTO_INCREMENT PRIMARY KEY, ExperimentName VARCHAR(100) NOT NULL,
-    StartDate DATETIME NOT NULL, EndDate DATETIME NOT NULL, Description VARCHAR(100) NOT NULL, 
-    CreatedTime DATETIME NOT NULL, UpdatedDate DATETIME NULL,Creator_UserID, FOREIGN KEY (Creator_UserID) REFERENCES user(UserID)) ENGINE=MyISAM;
+- CREATE TABLE mm_user ( UserID INT AUTO_INCREMENT PRIMARY KEY, Fname VARCHAR(50) NOT NULL, Lname VARCHAR(50) NOT NULL,
+    email VARCHAR(50) NOT NULL, role VARCHAR(50) NOT NULL, UserName VARCHAR(50) NOT NULL, password VARCHAR(100) NOT NULL,  
+    CreatedTime DATETIME NOT NULL) ENGINE=MyISAM;
+
+- CREATE TABLE mm_experiment ( ExperimentID INT AUTO_INCREMENT PRIMARY KEY, ExperimentName VARCHAR(100) NOT NULL, ExperimentCode VARCHAR(100),
+    StartDate DATETIME NOT NULL, EndDate DATETIME NOT NULL, Description VARCHAR(100) NOT NULL, CreatedTime DATETIME NOT NULL,
+     UpdatedDate DATETIME NULL,Creator_UserID, FOREIGN KEY (Creator_UserID) REFERENCES user(UserID)) ENGINE=MyISAM;
 
 - CREATE TABLE mm_participant_codes (
     participant_code_id INT AUTO_INCREMENT PRIMARY KEY,

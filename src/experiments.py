@@ -1,6 +1,7 @@
 from baseObject import baseObject
 from datetime import datetime
 from participants import participant_codes
+import hashlib
 
 class experiments(baseObject):
    
@@ -52,6 +53,12 @@ class experiments(baseObject):
         pc = participant_codes()
         access_code = pc.create_code(experiment_id)
         return access_code
+    
+    def generate_experiment_code(self, experiment_id):
+        """Generates an MD5 hash of the experiment_id."""
+        experiment_id_str = str(experiment_id).encode('utf-8')
+        experiment_code = hashlib.md5(experiment_id_str).hexdigest()
+        return experiment_code
     
     def getCreatedBy(self):
         sql = f'SELECT * FROM `mm_experiment` LEFT JOIN `mm_user` ON `mm_user`.`UserID`  = `mm_experiment`.`Creator_UserID`;'

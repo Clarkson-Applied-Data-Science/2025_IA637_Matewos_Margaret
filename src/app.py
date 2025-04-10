@@ -73,9 +73,6 @@ def homepage():
     # Render the homepage template
     return render_template('homepage.html', me=me)
 
-    
-    # Render the homepage
-    return render_template('homepage.html', me=me)
 
 @app.route('/login',methods = ['GET','POST'])
 def login():
@@ -107,12 +104,12 @@ def logout():
 @app.route('/main')
 def main():
     if checkSession() == False: 
-        return redirect('/login')
+        return redirect('/homepage')
     
     if session['user']['role'] == 'admin':
         return render_template('main.html', title='Main menu') 
     else:
-        return render_template('experiments/list.html', title='Experiments') 
+        return render_template('homepage.html', title='Survey App') 
 
 @app.route('/access/<code>')
 def access_with_code(code):
@@ -225,6 +222,8 @@ def manage_experiments():
             ExperimentID = e.data[0][e.pk] 
             pc = participant_codes()
             AccessCode = pc.create_code(ExperimentID)
+            experiment_code = e.generate_experiment_code(ExperimentID) 
+            e.data[0]['ExperimentCode'] = experiment_code 
             e.update() 
             return render_template('ok_dialog.html', msg="Experiment added.", code=AccessCode) 
         else:
