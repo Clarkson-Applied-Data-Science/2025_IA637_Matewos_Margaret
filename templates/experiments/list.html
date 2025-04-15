@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Experiments List</h2>
+
+<a href="/experiments/manage?action=new">➕ Add New Experiment</a><br><br>
+
+<table border="1" cellpadding="5">
+<tr>
+    <th>ID</th>
+    <th>Description</th>
+    <th>Start Date</th>
+    <th>End Date</th>
+    <th>Created</th>
+    <th>Code</th>
+    <th>Actions</th>
+</tr>
+{% for row in obj.data %}
+<tr>
+    <td>{{ row.ExperimentID }}</td>
+    <td>{{ row.Description }}</td>
+    <td>{{ row.StartDate }}</td>
+    <td>{{ row.EndDate }}</td>
+    <td>{{ row.CreatedTime }}</td>
+    <td>
+        {% if row.ExperimentCode %}
+            <a href="{{ url_for('survey') }}?code={{ row.ExperimentCode }}">🔗 View Survey</a>
+        {% else %}
+            None
+        {% endif %}
+    </td>
+    <td>
+        <a href="/experiments/manage?pkval={{ row.ExperimentID }}">Edit</a> |
+        <a href="/experiments/manage?action=delete&pkval={{ row.ExperimentID }}">Delete</a>
+    </td>
+</tr>
+{% endfor %}
+</table>
+{% endblock %}
+
+

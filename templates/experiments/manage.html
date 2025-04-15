@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Edit Experiment</h2>
+
+<div class="error_text">
+    {% if obj.errors | length > 0 %}
+        {% for error in obj.errors %}
+            <div>{{ error }}</div>
+        {% endfor %}
+    {% endif %}
+</div>
+
+<form action="manage?action=update&pkval={{ obj.data[0][obj.pk] }}" method="POST">
+    <label>Experiment ID:</label><br>
+    <input type="text" name="ExperimentID" value="{{ obj.data[0]['ExperimentID'] }}">
+
+    <label>Start Date:</label><br>
+    <input type="date" name="StartDate" value="{{ obj.data[0]['StartDate'] }}">
+
+    <label>End Date:</label><br>
+    <input type="date" name="EndDate" value="{{ obj.data[0]['EndDate'] }}">
+
+    <label>Description:</label><br>
+    <input type="text" name="Description" value="{{ obj.data[0]['Description'] }}">
+
+    <label>Updated On:</label><br>
+    <input type="text" name="UpdatedDate" value="{{ obj.data[0]['UpdatedDate'] }}">
+
+    <input type="submit" value="Save Changes">
+</form>
+{% endblock %}

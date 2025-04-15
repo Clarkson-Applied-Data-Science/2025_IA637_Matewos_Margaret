@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Add New Experiment</h2>
+
+<div class="error_text">
+    {% if obj.errors | length > 0 %}
+        {% for error in obj.errors %}
+            <div>{{ error }}</div>
+        {% endfor %}
+    {% endif %}
+</div>
+
+<form action="manage?action=insert" method="POST">
+    <label>Start Date:</label><br>
+    <input type="date" name="StartDate" value="{{ obj.data[0].StartDate }}">
+
+    <label>End Date:</label><br>
+    <input type="date" name="EndDate" value="{{ obj.data[0].EndDate }}" required>
+
+    <label>Description:</label><br>
+    <input type="text" name="Description" value="{{ obj.data[0].Description }}">
+
+    <label>Created On:</label><br>
+    <input type="text" name="CreatedTime" value="{{ obj.data[0].CreatedTime }}">
+
+    <input type="submit" value="Submit">
+</form>
+{% endblock %}

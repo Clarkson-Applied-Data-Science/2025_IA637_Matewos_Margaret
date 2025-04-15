@@ -8,7 +8,12 @@ class baseObject:
         self.errors = []
         self.fields = []
         self.pk = None
-        config = yaml.safe_load(Path("../config.yml").read_text())
+        #config = yaml.safe_load(Path("../config.yml").read_text())
+        config_path = Path(__file__).resolve().parents[1] / "config.yml"
+        config = yaml.safe_load(config_path.read_text())
+
+
+
 
         #print(type(self).__name__)
         self.tn = config['tables'][type(self).__name__]
@@ -36,7 +41,7 @@ class baseObject:
         for field in self.fields:
             sql += f'`{field}`,' + ' '
             vals += '%s, '
-            tokens.append(self.data[n][field])
+            tokens.append(self.data[n].get(field, None))
         sql = sql[0:-2]
         vals = vals[0:-2]
         sql += ') VALUES '
