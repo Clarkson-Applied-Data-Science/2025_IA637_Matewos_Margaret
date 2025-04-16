@@ -68,10 +68,8 @@ def manage_user():
             'Fname': request.form.get('Fname'),
             'Lname': request.form.get('Lname'),
             'email': request.form.get('email'),
-            'UserName': request.form.get('UserName'),
             'password': request.form.get('password'),
             'password2': request.form.get('password2'),
-            'AccessCode': o.generate_accesscode(),
             'CreatedTime': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         }
         o.set(d)
@@ -88,10 +86,8 @@ def manage_user():
             'Fname': request.form.get('Fname'),
             'Lname': request.form.get('Lname'),
             'email': request.form.get('email'),
-            'UserName': request.form.get('UserName'),
             'password': request.form.get('password'),
             'password2': request.form.get('password2'),
-            'AccessCode': request.form.get('AccessCode'),
             'CreatedTime': request.form.get('CreatedTime')
         })
         if o.verify_update():

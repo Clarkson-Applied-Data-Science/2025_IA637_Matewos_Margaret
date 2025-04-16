@@ -10,7 +10,7 @@
     </div>
     <div>
         <form action="manage?action=insert" method="POST">
-            Name:<br>
+            First Name:<br>
             <input type="text" name="Fname" value="{{ obj.data[0].Fname }}" />
             <br>
 
@@ -20,10 +20,6 @@
 
             Email:<br>
             <input type="text" name="email" value="{{ obj.data[0].email }}" />
-            <br>
-
-            Username:<br>
-            <input type="text" name="UserName" value="{{ obj.data[0].UserName }}" />
             <br>
 
             Password:<br>
@@ -44,15 +40,6 @@
                     {% endif %}
                 {% endfor %}
             </select>
-            <br>
-
-            Access Code:<br>
-            <input type="text" name="AccessCode" value="{{ obj.data[0].AccessCode }}" readonly="readonly" />
-            <br>
-
-            Created On:<br>
-            <input type="datetime-local" name="CreatedTime" value="{{ default_dt }}" readonly />
-            <br>
             <br>
 
             <input type="submit" value="Submit" />

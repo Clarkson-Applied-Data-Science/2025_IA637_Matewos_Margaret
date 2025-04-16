@@ -10,7 +10,7 @@
             </div>
             <div>
                 <form action="/users/manage?pkval={{ obj.data[0].UserID }}&action=update" method="POST">
-                    Name:<br>
+                    First Name:<br>
                     <input type="text" name="Fname" value="{{ obj.data[0].Fname }}" />
                     <br>
 
@@ -20,10 +20,6 @@
 
                     Email:<br>
                     <input type="text" name="email" value="{{ obj.data[0].email }}" />
-                    <br>
-
-                    Username:<br>
-                    <input type="text" name="UserName" value="{{ obj.data[0].UserName }}" />
                     <br>
 
                     Password:<br>
@@ -46,12 +42,6 @@
                     </select>
                     <br>
 
-                    Access Code:<br>
-                    <input type="text" name="AccessCode" value="{{ obj.data[0].AccessCode }}" readonly="readonly" />
-                    <br>
-                    Created on:<br>
-                    <input type="datetime" name="CreatedTime" value="{{ obj.data[0].CreatedTime }}" readonly="readonly" />
-                    <br>
                     <br>
                     <input type="submit" value="Submit" />
                 </form>
